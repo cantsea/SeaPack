@@ -1,0 +1,19 @@
+name: SeaPack
+version: '1.0-SNAPSHOT'
+main: org.seapack.SeaPack
+api-version: '1.21'
+softdepend: [WorldGuard]
+commands:
+  sitems:
+    description: Open the SeaPack custom item menu.
+    usage: /sitems [query|reload|import|rollback]
+permissions:
+  seapack.items.menu:
+    description: Allows opening the SeaPack item menu.
+    default: op
+  seapack.items.reload:
+    description: Allows reloading SeaPack item definitions.
+    default: op
+  seapack.items.import:
+    description: Allows importing or rolling back ItemsAdder contents and item cache.
+    default: op

@@ -1,6 +1,6 @@
 name: SeaPack
 version: '1.0-SNAPSHOT'
-main: org.seapack.SeaPack
+main: com.seapack.SeaPack
 api-version: '1.21'
 softdepend: [WorldGuard]
 commands:

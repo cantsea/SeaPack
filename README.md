@@ -151,9 +151,10 @@ display-name-prefix:
   enabled: false
   format: '<b><gradient:#FF30FF:#46FFFF>CUSTOM {suffix}</gradient></b>'
 global-lore:
-  enabled: false
+  enabled: true
   lines:
-  - '<gray>Dragonsoul set</gray>'
+  - '<gray>Dragonsoul {tool_type}</gray>'
+  - '<dark_gray>Base material: {material}</dark_gray>'
 enchant-sections:
   tools:
     enabled: false
@@ -196,6 +197,21 @@ Old `&` color codes still work for existing configs. Enchants use
 Bukkit/Minecraft enchantment keys such as `sharpness`, `unbreaking`,
 `protection`, or quoted namespaced keys such as `'minecraft:fire_aspect'`.
 
+Names, suffixes, item lore, and global lore support these per-item placeholders:
+
+| Placeholder | Value |
+|---|---|
+| `{material}` | Readable Bukkit material, such as `Paper` or `Diamond Pickaxe` |
+| `{material_key}` | Exact Bukkit material key, such as `PAPER` or `DIAMOND_PICKAXE` |
+| `{tool_type}` | Readable item type, such as `Pickaxe`, `Sword`, `Furniture`, or `Plushie` |
+| `{tool_type_key}` | Uppercase item type key, such as `PICKAXE` or `FURNITURE` |
+| `{suffix}` | The set item's configured or generated name suffix |
+
+For custom items whose Bukkit material is `PAPER`, SeaPack infers `{tool_type}`
+from the item key and then its category. For example,
+`dragonsoul_crystal_pickaxe` produces `{material}` as `Paper` and `{tool_type}`
+as `Pickaxe`.
+
 Do not edit item IDs, material, or CustomModelData in `customitems`. SeaPack does
 not read those values from custom item files. It always gets the real item ID,
 material, and CustomModelData from the current `items_ids_cache.yml`.
@@ -217,8 +233,16 @@ With that example, the sword's display name becomes `CUSTOM Sword` using the
 configured bold gradient. When `display-name-prefix.enabled` is `false`, each
 item's `display-name` is used directly.
 
-Set `global-lore.enabled` to `true` to append the same lore lines to every item
-in that set file.
+Set `global-lore.enabled` to `true` to append the configured lore lines to every
+item in that set file. Placeholders are resolved separately for each item:
+
+```yaml
+global-lore:
+  enabled: true
+  lines:
+  - '<gray>Type: <white>{tool_type}</white></gray>'
+  - '<gray>Material: <white>{material}</white></gray>'
+```
 
 Set an enchant section's `enabled` value to `true` to apply its enchantments to
 matching materials in that set. Material rules support exact materials,

@@ -207,6 +207,26 @@ Names, suffixes, item lore, and global lore support these per-item placeholders:
 | `{tool_type_key}` | Uppercase item type key, such as `PICKAXE` or `FURNITURE` |
 | `{suffix}` | The set item's configured or generated name suffix |
 
+Enchantments may use any level from `1` through `255`, including levels above
+their normal vanilla maximum. SeaPack also permits enchantments that vanilla
+considers mutually exclusive or inappropriate for the item's material. For
+example, both of these configurations are valid:
+
+```yaml
+enchants:
+  sharpness: 100
+```
+
+```yaml
+enchants:
+  infinity: 1
+  mending: 1
+```
+
+Minecraft's item data has a hard maximum enchantment level of `255`. SeaPack
+logs and ignores configured levels outside the `1` through `255` range instead
+of allowing the server to silently change them.
+
 For custom items whose Bukkit material is `PAPER`, SeaPack infers `{tool_type}`
 from the item key and then its category. For example,
 `dragonsoul_crystal_pickaxe` produces `{material}` as `Paper` and `{tool_type}`

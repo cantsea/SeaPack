@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -20,6 +21,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 
 final class ItemCustomizationReader {
+    static final int MAX_ENCHANTMENT_LEVEL = 255;
+
     private final SeaPack plugin;
     private final CustomItemConfigPaths paths;
 
@@ -214,26 +217,44 @@ final class ItemCustomizationReader {
     }
 
     private Map<Enchantment, Integer> readEnchantments(ConfigurationSection section, Path path) {
-        ConfigurationSection enchantSection = section.getConfigurationSection("enchants");
-        if (enchantSection == null) {
-            return Map.of();
-        }
-
         Map<Enchantment, Integer> enchantments = new LinkedHashMap<>();
-        for (String configuredName : enchantSection.getKeys(false)) {
+        Map<String, Integer> configuredEnchantments = configuredEnchantmentLevels(
+                section,
+                (configuredName, level) -> plugin.getLogger().warning(
+                        "Ignoring enchantment '" + configuredName + "' with invalid level "
+                                + level + " in " + path + ". Supported levels are 1 through "
+                                + MAX_ENCHANTMENT_LEVEL + "."
+                )
+        );
+        for (Map.Entry<String, Integer> entry : configuredEnchantments.entrySet()) {
+            String configuredName = entry.getKey();
             Enchantment enchantment = parseEnchantment(configuredName);
             if (enchantment == null) {
                 plugin.getLogger().warning("Ignoring unknown enchantment '" + configuredName + "' in " + path);
                 continue;
             }
+            enchantments.put(enchantment, entry.getValue());
+        }
+        return Map.copyOf(enchantments);
+    }
 
+    static Map<String, Integer> configuredEnchantmentLevels(
+            ConfigurationSection section,
+            BiConsumer<String, Integer> invalidLevelHandler
+    ) {
+        ConfigurationSection enchantSection = section.getConfigurationSection("enchants");
+        if (enchantSection == null) {
+            return Map.of();
+        }
+
+        Map<String, Integer> enchantments = new LinkedHashMap<>();
+        for (String configuredName : enchantSection.getKeys(false)) {
             int level = enchantSection.getInt(configuredName, 0);
-            if (level <= 0) {
-                plugin.getLogger().warning("Ignoring enchantment '" + configuredName + "' with invalid level "
-                        + level + " in " + path);
+            if (level < 1 || level > MAX_ENCHANTMENT_LEVEL) {
+                invalidLevelHandler.accept(configuredName, level);
                 continue;
             }
-            enchantments.put(enchantment, level);
+            enchantments.put(configuredName, level);
         }
         return Map.copyOf(enchantments);
     }

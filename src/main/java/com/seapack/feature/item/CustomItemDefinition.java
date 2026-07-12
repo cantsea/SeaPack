@@ -126,6 +126,8 @@ public record CustomItemDefinition(
         if (!lore.isEmpty()) {
             meta.lore(TextUtils.components(lore));
         }
+        // Ignore vanilla level limits intentionally. ItemMeta also retains mutually exclusive
+        // enchantments, allowing combinations such as Infinity and Mending.
         enchantments.forEach((enchantment, level) -> meta.addEnchant(enchantment, level, true));
         item.setItemMeta(meta);
 
